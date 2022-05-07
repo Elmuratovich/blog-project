@@ -1,11 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { UserService } from '../services/user.service';
 import { map, Observable, catchError, of } from 'rxjs';
 import { User, UserRole } from '../models/user.interface';
-import { off } from 'process';
 import { hasRoles } from 'src/auth/decorators/roles.decorator';
 import { RolesGuard } from '../../auth/guards/roles.guard';
 import { LocalAuthGuard } from '../../auth/guards/jwt-guard';
+import { Pagination } from 'nestjs-typeorm-paginate';
 
 @Controller('users')
 export class UserController {
@@ -15,7 +15,7 @@ export class UserController {
     create(@Body() user: User): Observable<User | Object> {
         return this.userService.create(user).pipe(
             map((user: User) => user),
-            catchError(err => of({error: err.message}))
+            catchError(err => of({ error: err.message }))
         );
     }
 
@@ -23,7 +23,7 @@ export class UserController {
     login(@Body() user: User): Observable<Object> {
         return this.userService.login(user).pipe(
             map((jwt: string) => {
-                return {access_token: jwt};
+                return { access_token: jwt };
             })
         )
     }
@@ -33,11 +33,18 @@ export class UserController {
         return this.userService.findOne(params.id)
     }
 
-    @hasRoles(UserRole.ADMIN)
-    @UseGuards(LocalAuthGuard, RolesGuard)
+    /*     @hasRoles(UserRole.ADMIN)
+        @UseGuards(LocalAuthGuard, RolesGuard) */
     @Get()
-    findAll(): Observable<User[]> {
-        return this.userService.findAll();
+    index(@Query('page') page: number = 1, @Query('limit') limit: number = 10,): Observable<Pagination<User>> {
+        limit = limit > 100 ? 100 : limit;
+
+        return this.userService.paginate({
+            page: Number(page),
+            limit: Number(limit) ,
+            route: 'http://localhost:3000/users'
+        });
+
     }
 
     @Delete(':id')
