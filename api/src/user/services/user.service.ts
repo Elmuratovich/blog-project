@@ -29,5 +29,3 @@ export class UserService {
         return from(this.userRepository.update(id, user));
     }
 }
-
-
