@@ -5,6 +5,11 @@ import { Repository } from 'typeorm';
 import { UserEntity } from '../models/user.entity';
 import { User } from '../models/user.interface';
 import { AuthService } from '../../auth/services/auth.service';
+import {
+    paginate,
+    Pagination,
+    IPaginationOptions,
+} from 'nestjs-typeorm-paginate';
 
 @Injectable()
 export class UserService {
@@ -19,7 +24,7 @@ export class UserService {
                 newUser.username = user.username;
                 newUser.email = user.email;
                 newUser.password = passwordHash;
-                newUser.role = user.role;   
+                newUser.role = user.role;
 
                 return from(this.userRepository.save(newUser)).pipe(
                     map((user: User) => {
@@ -68,7 +73,7 @@ export class UserService {
     login(user: User): Observable<string> {
         return this.validateUser(user.email, user.password).pipe(
             switchMap((user: User) => {
-                if(user) {
+                if (user) {
                     return this.authService.generateJWT(user).pipe(map((jwt: string) => jwt));
                 } else {
                     return 'Wrong Credentials';
@@ -81,8 +86,8 @@ export class UserService {
         return this.findByMail(email).pipe(
             switchMap((user: User) => this.authService.comparePasswords(password, user.password).pipe(
                 map((match: boolean) => {
-                    if(match) {
-                        const {password, ...result} = user;
+                    if (match) {
+                        const { password, ...result } = user;
                         return result;
                     } else {
                         throw Error;
