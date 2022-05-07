@@ -152,6 +152,27 @@
 				}
 			},
 			"response": []
+		},
+		{
+			"name": "update Role user Jwt",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3000/users/12/role",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"users",
+						"12",
+						"role"
+					]
+				}
+			},
+			"response": []
 		}
 	]
 }
