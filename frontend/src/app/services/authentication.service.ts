@@ -15,6 +15,7 @@ export class AuthenticationService {
       map((token) => {
         console.log('token');
         localStorage.setItem('blog-token', token.access_token);
+        
         return token;
       })
     )
